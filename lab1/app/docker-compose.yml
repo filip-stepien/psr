@@ -1,0 +1,19 @@
+services:
+    hazelcast:
+        image: hazelcast/hazelcast:5.6.0
+        container_name: psr-hazelcast
+        ports:
+            - '5701:5701'
+        environment:
+            HZ_CLUSTERNAME: dev
+
+    hazelcast-gui:
+        image: hazelcast/management-center:5.6.0
+        container_name: psr-hazelcast-management-center
+        depends_on:
+            - hazelcast
+        ports:
+            - '8080:8080'
+        environment:
+            MC_DEFAULT_CLUSTER: dev
+            MC_DEFAULT_CLUSTER_MEMBERS: hazelcast

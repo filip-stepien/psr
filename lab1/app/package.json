@@ -1,0 +1,31 @@
+{
+    "name": "psr-bedla-hazelcast",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "start": "tsx src/main.ts",
+        "build": "tsc",
+        "lint": "eslint .",
+        "pretty": "prettier --write .",
+        "hazelcast:up": "docker compose up -d",
+        "hazelcast:down": "docker compose down",
+        "hazelcast:logs": "docker compose logs -f"
+    },
+    "dependencies": {
+        "@faker-js/faker": "^10.4.0",
+        "@inquirer/prompts": "^8.4.2",
+        "env-var": "^7.5.0",
+        "hazelcast-client": "^5.5.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^22.13.10",
+        "eslint": "^10.3.0",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.8.3",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.2",
+        "typescript-eslint": "^8.59.1"
+    }
+}
