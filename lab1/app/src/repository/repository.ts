@@ -1,4 +1,4 @@
-import { Parent } from '../entities/parent';
+import { Viewer } from '../entities/viewer';
 
 export interface Repository {
     getStoreName(): string;
@@ -7,8 +7,8 @@ export interface Repository {
     disconnect(): Promise<void>;
     clear(): Promise<void>;
 
-    saveMany(items: Parent[]): Promise<void>;
-    getMany(ids: string[]): Promise<Parent[]>;
-    updateMany(items: Parent[]): Promise<void>;
+    saveMany(items: Viewer[]): Promise<void>;
+    getMany(ids: string[]): Promise<Viewer[]>;
+    updateMany(items: Viewer[]): Promise<void>;
     deleteMany(ids: string[]): Promise<void>;
 }

@@ -12,10 +12,8 @@ export class ResultWriter {
     }
 
     public async append(storeName: string, operationName: string, timeInMilliseconds: number) {
-        await appendFile(
-            this.filePath,
-            `${storeName};${operationName};${timeInMilliseconds};\n`,
-            'utf8'
-        );
+        const line = `${storeName};${operationName};${timeInMilliseconds}\n`;
+        await appendFile(this.filePath, line, 'utf8');
+        return line;
     }
 }

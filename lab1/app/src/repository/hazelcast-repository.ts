@@ -1,6 +1,6 @@
 import { Client, IMap } from 'hazelcast-client';
-import { Child } from '../entities/child';
-import { Parent } from '../entities/parent';
+import { Ticket } from '../entities/ticket';
+import { Viewer } from '../entities/viewer';
 import { Repository } from './repository';
 
 export class HazelcastRepository implements Repository {
@@ -11,7 +11,7 @@ export class HazelcastRepository implements Repository {
     private map?: IMap<string, string>;
 
     constructor(props: { mapName?: string; clusterName?: string; clusterMembers?: string[] } = {}) {
-        this.mapName = props.mapName ?? 'parents';
+        this.mapName = props.mapName ?? 'dev-map';
         this.clusterName = props.clusterName ?? 'dev';
         this.clusterMembers = props.clusterMembers ?? ['127.0.0.1:5701'];
     }
@@ -24,26 +24,18 @@ export class HazelcastRepository implements Repository {
         return this.map;
     }
 
-    private serialize(parent: Parent) {
-        return JSON.stringify(parent);
+    private serialize(viewer: Viewer) {
+        return JSON.stringify(viewer);
     }
 
     private deserialize(value: string) {
-        const parsed = JSON.parse(value) as Parent;
+        const parsed = JSON.parse(value) as Viewer;
 
-        return new Parent({
+        return new Viewer({
             id: parsed.id,
             name: parsed.name,
-            description: parsed.description,
-            children: parsed.children.map(
-                child =>
-                    new Child({
-                        id: child.id,
-                        name: child.name,
-                        value: child.value,
-                        createdAt: child.createdAt
-                    })
-            )
+            email: parsed.email,
+            tickets: parsed.tickets.map(ticket => new Ticket({ ...ticket }))
         });
     }
 
@@ -71,7 +63,7 @@ export class HazelcastRepository implements Repository {
         await this.getMap().clear();
     }
 
-    public async saveMany(items: Parent[]) {
+    public async saveMany(items: Viewer[]) {
         await Promise.all(items.map(item => this.getMap().put(item.id, this.serialize(item))));
     }
 
@@ -80,7 +72,7 @@ export class HazelcastRepository implements Repository {
         return values.map(value => this.deserialize(value));
     }
 
-    public async updateMany(items: Parent[]) {
+    public async updateMany(items: Viewer[]) {
         await this.saveMany(items);
     }
 

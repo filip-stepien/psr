@@ -1,13 +1,11 @@
 import { performance } from 'perf_hooks';
-import { Child } from '../entities/child';
-import { Parent } from '../entities/parent';
 import { Repository } from '../repository/repository';
 import { DataGenerator } from './data-generator';
 import { ResultWriter } from './result-writer';
 
 export class Benchmark {
     private readonly recordsCount: number;
-    private readonly childrenPerParent: number;
+    private readonly ticketsPerViewer: number;
     private readonly repository: Repository;
     private readonly dataGenerator: DataGenerator;
     private readonly resultWriter: ResultWriter;
@@ -17,17 +15,17 @@ export class Benchmark {
         dataGenerator: DataGenerator;
         resultWriter: ResultWriter;
         recordsCount: number;
-        childrenPerParent: number;
+        ticketsPerViewer: number;
     }) {
         this.repository = props.repository;
         this.dataGenerator = props.dataGenerator;
         this.resultWriter = props.resultWriter;
         this.recordsCount = props.recordsCount;
-        this.childrenPerParent = props.childrenPerParent;
+        this.ticketsPerViewer = props.ticketsPerViewer;
     }
 
     private createData() {
-        return this.dataGenerator.generateParents(this.recordsCount, this.childrenPerParent);
+        return this.dataGenerator.generateViewers(this.recordsCount, this.ticketsPerViewer);
     }
 
     private async seedData() {
@@ -39,45 +37,24 @@ export class Benchmark {
         return data;
     }
 
-    private prepareUpdatedData(data: Parent[]) {
-        return data.map(
-            parent =>
-                new Parent({
-                    id: parent.id,
-                    name: `${parent.name} updated`,
-                    description: `${parent.description} updated`,
-                    children: parent.children.map(
-                        child =>
-                            new Child({
-                                id: child.id,
-                                name: child.name,
-                                value: `${child.value} updated`,
-                                createdAt: child.createdAt
-                            })
-                    )
-                })
-        );
-    }
-
     private async measure(operationName: string, operation: () => Promise<void>) {
         const start = performance.now();
         await operation();
         const end = performance.now();
 
         const timeInMilliseconds = Math.round(end - start);
-
-        await this.resultWriter.append(
+        const appendedLine = await this.resultWriter.append(
             this.repository.getStoreName(),
             operationName,
             timeInMilliseconds
         );
 
-        console.log(`${this.repository.getStoreName()};${operationName};${timeInMilliseconds};`);
+        console.log(appendedLine);
     }
 
     public async runSave() {
         await this.repository.clear();
-        await this.measure('zapis', async () => {
+        await this.measure('save', async () => {
             await this.repository.saveMany(this.createData());
         });
     }
@@ -85,9 +62,9 @@ export class Benchmark {
     public async runGet() {
         await this.seedData();
 
-        const ids = this.dataGenerator.generateParentIds(this.recordsCount);
+        const ids = this.dataGenerator.generateViewerIds(this.recordsCount);
 
-        await this.measure('pobieranie', async () => {
+        await this.measure('select', async () => {
             const items = await this.repository.getMany(ids);
 
             if (items.length !== this.recordsCount) {
@@ -98,9 +75,9 @@ export class Benchmark {
 
     public async runUpdate() {
         const data = await this.seedData();
-        const updatedData = this.prepareUpdatedData(data);
+        const updatedData = this.dataGenerator.generateUpdatedViewers(data);
 
-        await this.measure('aktualizacja', async () => {
+        await this.measure('update', async () => {
             await this.repository.updateMany(updatedData);
         });
     }
@@ -108,9 +85,9 @@ export class Benchmark {
     public async runDelete() {
         await this.seedData();
 
-        const ids = this.dataGenerator.generateParentIds(this.recordsCount);
+        const ids = this.dataGenerator.generateViewerIds(this.recordsCount);
 
-        await this.measure('kasowanie', async () => {
+        await this.measure('delete', async () => {
             await this.repository.deleteMany(ids);
         });
     }

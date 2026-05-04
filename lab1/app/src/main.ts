@@ -17,7 +17,7 @@ async function main() {
         dataGenerator: new DataGenerator(),
         resultWriter: new ResultWriter({ filePath: env.resultFilePath }),
         recordsCount: env.recordsCount,
-        childrenPerParent: env.childrenPerParent
+        ticketsPerViewer: env.ticketsPerViewer
     });
 
     const menu = new Menu({ benchmark, recordsCount: env.recordsCount });
