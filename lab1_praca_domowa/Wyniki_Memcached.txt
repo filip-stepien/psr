@@ -1,0 +1,12 @@
+parents;zapis;115;
+parents;zapis;84;
+parents;zapis;68;
+parents;pobieranie;36;
+parents;pobieranie;14;
+parents;pobieranie;16;
+parents;aktualizacja;15;
+parents;aktualizacja;17;
+parents;aktualizacja;21;
+parents;kasowanie;9;
+parents;kasowanie;16;
+parents;kasowanie;26;
