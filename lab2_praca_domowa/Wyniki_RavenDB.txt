@@ -1,0 +1,4 @@
+routes;zapis;214;
+routes;pobieranie;78;
+routes;aktualizacja;105;
+routes;kasowanie;45;

@@ -1,0 +1,22 @@
+services:
+    cassandra:
+        image: cassandra:5.0
+        container_name: psr-cassandra
+        ports:
+            - '9042:9042'
+        environment:
+            CASSANDRA_CLUSTER_NAME: psr
+            CASSANDRA_DC: datacenter1
+            CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+            HEAP_NEWSIZE: 128M
+            MAX_HEAP_SIZE: 512M
+        healthcheck:
+            test: ['CMD-SHELL', "cqlsh -e 'describe keyspaces'"]
+            interval: 15s
+            timeout: 10s
+            retries: 20
+        volumes:
+            - cassandra-data:/var/lib/cassandra
+
+volumes:
+    cassandra-data:
